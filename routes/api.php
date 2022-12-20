@@ -23,6 +23,6 @@ Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('whoami', [AuthController::class, 'whoami']);
+    Route::get('whoami', [AuthController::class, 'whoami']);
     Route::post('logout', [AuthController::class, 'logout']);
 });
