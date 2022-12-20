@@ -12,12 +12,12 @@ class AuthController extends Controller
 {
     public function register(RegisterRequest $request)
     {
-        // $request->validate();
+        $validated = $request->validated();
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password)
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password'])
         ]);
 
         $token = $user->createToken('Token de ' . $user->name)->plainTextToken;
