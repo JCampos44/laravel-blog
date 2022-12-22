@@ -24,9 +24,20 @@ class CreatePostRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'required|max:255',
+            'title' => 'required|unique:posts,title',
             'content' => 'required',
-            'photo' => 'required|file|image'
+            'photo' => 'required|image'
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'title.required' => 'El título es requerido',
+            'title.unique' => 'Ya existe otro post con este título',
+            'content.required' => 'El contenido es requerido',
+            'photo.required' => 'Debe subir una foto para el post',
+            'photo.image' => 'Debe subir una imagen'
         ];
     }
 }

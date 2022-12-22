@@ -12,17 +12,15 @@ class AuthController extends Controller
 {
     public function register(RegisterRequest $request)
     {
-        $validated = $request->validated();
-
         $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password'])
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password)
         ]);
 
         $token = $user->createToken('Token de ' . $user->name)->plainTextToken;
 
-        return response()->json([
+        return response([
             'user' => $user,
             'token' => $token
         ]);
@@ -31,7 +29,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json([
+            return response([
                 'message' => 'No autorizado'
             ], 401);
         }
@@ -40,7 +38,7 @@ class AuthController extends Controller
 
         $token = $user->createToken('Token de ' . $user->name)->plainTextToken;
 
-        return response()->json([
+        return response([
             'user' => $user,
             'token' => $token
         ]);
@@ -50,14 +48,14 @@ class AuthController extends Controller
     {
         auth()->user()->tokens()->delete();
 
-        return response()->json([
+        return response([
             'message' => 'Sesión cerrada'
         ]);
     }
 
     public function whoami()
     {
-        return response()->json([
+        return response([
             'user' => auth()->user()
         ]);
     }
