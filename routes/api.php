@@ -23,7 +23,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 
+Route::get('posts', [PostController::class, 'index']);
+Route::get('/post/{slug}', [PostController::class, 'show']);
+
 Route::middleware('auth:sanctum')->group(function () {
+    
     Route::get('whoami', [AuthController::class, 'whoami']);
     Route::post('logout', [AuthController::class, 'logout']);
 

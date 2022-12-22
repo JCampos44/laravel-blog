@@ -18,7 +18,11 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        $posts = Post::all();
+
+        return response([
+            'posts' => $posts
+        ]);
     }
 
     /**
@@ -29,9 +33,7 @@ class PostController extends Controller
      */
     public function store(CreatePostRequest $request)
     {
-        // $validated = $request->validated();
-
-        $path = $request->file('photo')->store(Str::slug($request->title) . '/posts');
+        $path = $request->file('photo')->store('posts/' . Str::slug($request->title));
 
         $post = Post::create([
             'title' => $request->title,
@@ -40,11 +42,9 @@ class PostController extends Controller
             'status' => 'published',
             'slug' => Str::slug($request->title),
             'user_id' => auth()->user()->id
-
         ]);
 
         return response([
-            // 'validated' => $validated
             'post' => $post
         ]);
     }
@@ -55,9 +55,13 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($slug)
     {
-        //
+        $post = Post::where('slug', $slug)->firstOrFail();
+
+        return response([
+            'post' => $post
+        ]);
     }
 
     /**
