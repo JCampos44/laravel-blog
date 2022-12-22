@@ -17,7 +17,7 @@ class CreatePostsTable extends Migration
             $table->id();
             $table->string('title');
             $table->text('content');
-            $table->string('photo');
+            $table->string('photo')->nullable();
             $table->enum('status', ['published', 'hidden']);
             $table->string('slug');
             $table->timestamps();

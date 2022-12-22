@@ -32,5 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
 
     Route::post('posts/create', [PostController::class, 'store']);
+    Route::post('posts/update', [PostController::class, 'update']);
+    Route::delete('posts/delete/{id}', [PostController::class, 'destroy'])->whereNumber('id');
 
 });

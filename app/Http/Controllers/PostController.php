@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreatePostRequest;
+use App\Http\Requests\UpdatePostRequest;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -33,15 +34,17 @@ class PostController extends Controller
      */
     public function store(CreatePostRequest $request)
     {
-        $path = $request->file('photo')->store('posts/' . Str::slug($request->title));
-
         $post = Post::create([
             'title' => $request->title,
             'content' => $request->content,
-            'photo' => Storage::url($path),
-            'status' => 'published',
             'slug' => Str::slug($request->title),
             'user_id' => auth()->user()->id
+        ]);
+
+        $path = $request->file('photo')->store('posts/' . $post->id);
+
+        $post->update([
+            'photo' => Storage::url($path)
         ]);
 
         return response([
@@ -64,16 +67,39 @@ class PostController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+    
+    public function update(UpdatePostRequest $request)
     {
-        //
+        $post = Post::where('id', $request->id)->firstOrFail();
+
+        if (auth()->user()->cannot('isMyPost', $post)) {
+            return response([
+                'message' => 'No cuentas con los permisos para realizar esta accion'
+            ], 403);
+        }
+
+        $post->update([
+            'title' => $request->title,
+            'content' => $request->content,
+            'status' => $request->status,
+            'slug' => Str::slug($request->title)
+        ]);
+
+        if ($request->hasFile('photo')) {
+            Storage::deleteDirectory('posts/' . $post->id);
+
+            $path = $request->file('photo')->store('posts/' . $post->id);
+
+            $post->update([
+                'photo' => Storage::url($path)
+            ]);
+            
+        }
+
+        return response([
+            'post' => $post
+        ]);
+
     }
 
     /**
@@ -84,6 +110,22 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        //
+
+        $post = Post::where('id', $id)->firstOrFail();
+
+        if (auth()->user()->cannot('isMyPost', $post)) {
+            return response([
+                'message' => 'No cuentas con los permisos para realizar esta accion'
+            ], 403);
+        }
+
+        Storage::deleteDirectory('posts/' . $post->id);
+
+        $post->delete();
+
+        return response([
+            'post' => $post
+        ]);
+
     }
 }
